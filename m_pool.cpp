@@ -4,10 +4,21 @@
 #include <thread>
 #include <atomic>
 #include <stdexcept>
+#include <mutex>
+#include <memory>
+
+// 基础内存池接口
+template<typename T>
+class MemoryPoolBase {
+public:
+    virtual ~MemoryPoolBase() = default;
+    virtual T* allocate() = 0;
+    virtual void deallocate(T* ptr) = 0;
+};
 
 // T 必须是 trivially_destructible，因为我们不会调用析构函数
 template<typename T>
-class LockFreeMemoryPool {
+class LockFreeMemoryPool : public MemoryPoolBase<T> {
 private:
     // 内存块节点
     struct Node {
@@ -52,6 +63,85 @@ public:
     static bool is_lock_free() {
         std::atomic<TaggedPointer> dummy;
         return dummy.is_lock_free();
+    }
+};
+
+// 基于互斥锁的备用实现
+template<typename T>
+class MutexMemoryPool : public MemoryPoolBase<T> {
+private:
+    struct Node {
+        Node* next;
+    };
+    
+    void* raw_memory_;
+    Node* head_;
+    std::mutex mutex_;
+    const size_t capacity_;
+    
+public:
+    explicit MutexMemoryPool(size_t count) : capacity_(count) {
+        static_assert(sizeof(T) >= sizeof(Node), "T must be at least the size of a pointer.");
+        
+        raw_memory_ = new char[sizeof(T) * count];
+        Node* current = reinterpret_cast<Node*>(raw_memory_);
+        head_ = current;
+        char* current_char = reinterpret_cast<char*>(raw_memory_);
+        
+        for(size_t i = 0; i < count - 1; i++) {
+            Node* next = reinterpret_cast<Node*>(current_char + sizeof(T));
+            current->next = next;
+            current = next;
+            current_char += sizeof(T);
+        }
+        current->next = nullptr;
+    }
+    
+    ~MutexMemoryPool() {
+        delete[] static_cast<char*>(raw_memory_);
+    }
+    
+    T* allocate() override {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (head_ == nullptr) {
+            return nullptr;
+        }
+        Node* result = head_;
+        head_ = head_->next;
+        return reinterpret_cast<T*>(result);
+    }
+    
+    void deallocate(T* ptr) override {
+        Node* node = reinterpret_cast<Node*>(ptr);
+        std::lock_guard<std::mutex> lock(mutex_);
+        node->next = head_;
+        head_ = node;
+    }
+};
+
+// 自适应内存池：自动选择最佳实现
+template<typename T>
+class AdaptiveMemoryPool {
+private:
+    std::unique_ptr<MemoryPoolBase<T>> pool_;
+    
+public:
+    explicit AdaptiveMemoryPool(size_t count) {
+        if (LockFreeMemoryPool<T>::is_lock_free()) {
+            pool_ = std::make_unique<LockFreeMemoryPool<T>>(count);
+            std::cout << "Using lock-free memory pool implementation." << std::endl;
+        } else {
+            pool_ = std::make_unique<MutexMemoryPool<T>>(count);
+            std::cout << "Using mutex-based memory pool implementation." << std::endl;
+        }
+    }
+    
+    T* allocate() {
+        return pool_->allocate();
+    }
+    
+    void deallocate(T* ptr) {
+        pool_->deallocate(ptr);
     }
 };
 
@@ -173,7 +263,7 @@ struct MyObject {
 const int THREAD_COUNT = 8;
 const int ALLOCATIONS_PER_THREAD = 1000000;
 
-void test_worker(LockFreeMemoryPool<MyObject>& pool) {
+void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     std::vector<MyObject*> allocated_objects;
     allocated_objects.reserve(ALLOCATIONS_PER_THREAD);
 
@@ -201,17 +291,8 @@ int main() {
     std::cout << "sizeof(std::string) is " << sizeof(std::string) << std::endl;
     std::cout << "sizeof(MyObject) is " << sizeof(MyObject) << std::endl;
 
-    // 检查当前平台是否支持无锁实现
-    if (!LockFreeMemoryPool<MyObject>::is_lock_free()) {
-        std::cerr << "Lock-free operations on TaggedPointer are not supported on this platform." << std::endl;
-        std::cerr << "This is common on 32-bit systems or platforms without 128-bit atomic compare-and-swap." << std::endl;
-        return 1;
-    }
-
-    std::cout << "Atomic TaggedPointer is lock-free. Starting test." << std::endl;
-
-    // 创建一个足够大的内存池
-    LockFreeMemoryPool<MyObject> pool(THREAD_COUNT * ALLOCATIONS_PER_THREAD);
+    // 创建自适应内存池（自动选择最佳实现）
+    AdaptiveMemoryPool<MyObject> pool(THREAD_COUNT * ALLOCATIONS_PER_THREAD);
     // getchar();
     std::vector<std::thread> threads;
     for (int i = 0; i < THREAD_COUNT; ++i) {

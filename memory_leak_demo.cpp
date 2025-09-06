@@ -144,7 +144,5 @@ int main() {
     
     std::cout << "========================================" << std::endl;
     std::cout << "程序即将结束，但分配的内存没有被释放" << std::endl;
-    std::cout << "使用 leaks 工具可以检测到这些内存泄露" << std::endl;
-    
     return 0;
 }
