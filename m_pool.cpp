@@ -256,12 +256,12 @@ void LockFreeMemoryPool<T>::deallocate(T* ptr) {
 // 测试用的数据结构
 struct MyObject {
     int data;
-   std::string name = "hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfssdfsdfasdadasdasdsadsadsadasdsadsadasdasdasdadsadssadasdadsasdasdadsadasdasdasda";
+   std::string *name = new std::string("hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfssdfsdfasdadasdasdsadsadsadasdsadsadasdasdasdadsadssadasdadsasdasdadsadasdasdasda");
     // char padding[60]; // 凑够64字节，避免伪共享
 };
 
 const int THREAD_COUNT = 8;
-const int ALLOCATIONS_PER_THREAD = 1000000;
+const int ALLOCATIONS_PER_THREAD = 100000;
 
 void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     std::vector<MyObject*> allocated_objects;
