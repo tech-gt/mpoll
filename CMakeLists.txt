@@ -40,3 +40,7 @@ add_executable(demo demo.cpp)
 add_executable(mpoll m_pool.cpp)
 add_executable(leak_demo memory_leak_demo.cpp)
 add_executable(leak_demo_sleep leak_demo_with_sleep.cpp)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # 如果是 Linux，则链接 atomic 库
+    target_link_libraries(mpoll PRIVATE atomic)
+endif()
