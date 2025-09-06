@@ -256,8 +256,9 @@ void LockFreeMemoryPool<T>::deallocate(T* ptr) {
 // 测试用的数据结构
 struct MyObject {
     int data;
-   std::string *name = new std::string("hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfssdfsdfasdadasdasdsadsadsadasdsadsadasdasdasdadsadssadasdadsasdasdadsadasdasdasda");
+//   std::string *name = new std::string("hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfssdfsdfasdadasdasdsadsadsadasdsadsadasdasdasdadsadssadasdadsasdasdadsadasdasdasda");
     // char padding[60]; // 凑够64字节，避免伪共享
+    std::string name;
 };
 
 const int THREAD_COUNT = 8;
@@ -272,6 +273,7 @@ void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
         MyObject* obj = pool.allocate();
         if (obj) {
             obj->data = i;
+            obj->name = "hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfs";
             allocated_objects.push_back(obj);
         } else {
             // 如果池耗尽，可以等待或处理
