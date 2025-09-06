@@ -272,6 +272,8 @@ void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     for (int i = 0; i < ALLOCATIONS_PER_THREAD; ++i) {
         MyObject* obj = pool.allocate();
         if (obj) {
+            // 使用placement new正确构造对象
+            new (obj) MyObject();
             obj->data = i;
             obj->name = "hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfs";
             allocated_objects.push_back(obj);
@@ -283,6 +285,8 @@ void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     // Phase 2: Deallocation
     for (MyObject* obj : allocated_objects) {
         assert(obj != nullptr);
+        // 显式调用析构函数以释放std::string内存
+        obj->~MyObject();
         pool.deallocate(obj);
     }
 }
