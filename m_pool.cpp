@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <mutex>
 #include <memory>
+#include <cstring>
 
 // 基础内存池接口
 template<typename T>
@@ -257,8 +258,8 @@ void LockFreeMemoryPool<T>::deallocate(T* ptr) {
 struct MyObject {
     int data;
 //   std::string *name = new std::string("hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfssdfsdfasdadasdasdsadsadsadasdsadsadasdasdasdadsadssadasdadsasdasdadsadasdasdasda");
-    // char padding[60]; // 凑够64字节，避免伪共享
-    std::string name;
+    char padding[60]; // 凑够64字节，避免伪共享
+    // std::string name;
 };
 
 const int THREAD_COUNT = 8;
@@ -272,10 +273,9 @@ void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     for (int i = 0; i < ALLOCATIONS_PER_THREAD; ++i) {
         MyObject* obj = pool.allocate();
         if (obj) {
-            // 使用placement new正确构造对象
-            new (obj) MyObject();
             obj->data = i;
-            obj->name = "hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfs";
+            strncpy(obj->padding, "hello world nihao sdfafsdfsdffssdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfs", sizeof(obj->padding) - 1);
+            obj->padding[sizeof(obj->padding) - 1] = '\0'; // 确保字符串以null结尾
             allocated_objects.push_back(obj);
         } else {
             // 如果池耗尽，可以等待或处理
@@ -285,8 +285,6 @@ void test_worker(AdaptiveMemoryPool<MyObject>& pool) {
     // Phase 2: Deallocation
     for (MyObject* obj : allocated_objects) {
         assert(obj != nullptr);
-        // 显式调用析构函数以释放std::string内存
-        obj->~MyObject();
         pool.deallocate(obj);
     }
 }
