@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan",
+  "command": "g++  -I/Users/gaotong/work/cpplearn/memorypool -fsanitize=address -g  -std=gnu++14 -fPIC -O3 -g -o CMakeFiles/demo.dir/demo.cpp.o -c /Users/gaotong/work/cpplearn/memorypool/demo.cpp",
+  "file": "/Users/gaotong/work/cpplearn/memorypool/demo.cpp",
+  "output": "CMakeFiles/demo.dir/demo.cpp.o"
+},
+{
+  "directory": "/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan",
+  "command": "g++  -I/Users/gaotong/work/cpplearn/memorypool -fsanitize=address -g  -std=gnu++14 -fPIC -O3 -g -o CMakeFiles/mpoll.dir/m_pool.cpp.o -c /Users/gaotong/work/cpplearn/memorypool/m_pool.cpp",
+  "file": "/Users/gaotong/work/cpplearn/memorypool/m_pool.cpp",
+  "output": "CMakeFiles/mpoll.dir/m_pool.cpp.o"
+},
+{
+  "directory": "/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/test",
+  "command": "g++  -I/Users/gaotong/work/cpplearn/memorypool -fsanitize=address -g  -std=gnu++14 -fPIC -O3 -g -o CMakeFiles/mempool_test.dir/src/mempool_test.cc.o -c /Users/gaotong/work/cpplearn/memorypool/test/src/mempool_test.cc",
+  "file": "/Users/gaotong/work/cpplearn/memorypool/test/src/mempool_test.cc",
+  "output": "test/CMakeFiles/mempool_test.dir/src/mempool_test.cc.o"
+}
+]

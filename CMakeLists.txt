@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 if (USE_CLANG)
     set(ENV{CC} "clang")
@@ -36,3 +36,7 @@ include_directories(
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(test)
+add_executable(demo demo.cpp)
+add_executable(mpoll m_pool.cpp)
+add_executable(leak_demo memory_leak_demo.cpp)
+add_executable(leak_demo_sleep leak_demo_with_sleep.cpp)

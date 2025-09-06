@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/cmake_install.cmake",
+		"/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/test/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

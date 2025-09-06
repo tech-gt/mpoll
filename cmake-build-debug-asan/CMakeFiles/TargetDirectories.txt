@@ -1,0 +1,7 @@
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/CMakeFiles/demo.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/CMakeFiles/mpoll.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/CMakeFiles/edit_cache.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/CMakeFiles/rebuild_cache.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/test/CMakeFiles/mempool_test.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/test/CMakeFiles/edit_cache.dir
+/Users/gaotong/work/cpplearn/memorypool/cmake-build-debug-asan/test/CMakeFiles/rebuild_cache.dir

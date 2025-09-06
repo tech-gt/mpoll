@@ -4,4 +4,4 @@ SET(mempool_test_SRCS
 
 add_executable(mempool_test ${mempool_test_SRCS})
 
-target_link_libraries(mempool_test pthread atomic)
+target_link_libraries(mempool_test pthread )

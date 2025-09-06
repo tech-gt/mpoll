@@ -1,0 +1,1 @@
+g++ -fsanitize=address -g  -std=gnu++14 -fPIC -O3 -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/mpoll.dir/m_pool.cpp.o -o mpoll
